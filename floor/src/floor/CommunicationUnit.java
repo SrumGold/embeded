@@ -75,9 +75,9 @@ public class CommunicationUnit {
 	public void sendPress(int floor, Direction dir) {
 		Message m;
 		if (Direction.UP == dir) {
-			m = new Message(floor, Action.FLOOR_PRESS_UP, true);
+			m = new Message(floor, Action.FLOOR_PRESS_UP, true, -1);
 		} else {
-			m = new Message(floor, Action.FLOOR_PRESS_DOWN, true);
+			m = new Message(floor, Action.FLOOR_PRESS_DOWN, true, -1);
 		}
 		
 		System.out.println("sending press " + m.encode());
