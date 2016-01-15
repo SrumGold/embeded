@@ -19,9 +19,7 @@ public class CommunicationUnit implements UiHandler , commuicationHandler{
 	PrintWriter _floorOut;
 	BufferedReader _floorIn;
 
-	Socket _carSocket;
-	PrintWriter _carOut;
-	BufferedReader _carIn;
+	ServerSocket _carServerSocket;
 
 	public void setProtocol(Protocol p) {
 		_protocol = p;
@@ -75,6 +73,10 @@ public class CommunicationUnit implements UiHandler , commuicationHandler{
 				}
 			}
 		}).start();
+	}
+	
+	public void startCarServer() {
+		_carServerSocket = 
 	}
 
 	public void sendToFloor(Message msg) {
