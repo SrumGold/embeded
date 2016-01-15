@@ -1,0 +1,11 @@
+
+.metadata
+*.jar
+*.class
+*~
+
+#.*
+*/.classpath
+*/.project
+*/.settings/
+
