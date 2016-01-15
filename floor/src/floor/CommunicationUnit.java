@@ -80,7 +80,7 @@ public class CommunicationUnit {
 			m = new Message(floor, Action.FLOOR_PRESS_DOWN, true, -1);
 		}
 		
-		System.out.println("sending press " + m.encode());
+		System.out.println("Sending press " + m.encode());
 		_out.println(m.encode());
 	}
 
