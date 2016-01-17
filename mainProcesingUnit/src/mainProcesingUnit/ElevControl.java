@@ -10,4 +10,7 @@ public interface ElevControl {
 	public boolean closeDoor();
 	public void emergencyStop();
 	
+	public int getElevId();
+	public void setElevId(int _elevId);
+	
 }

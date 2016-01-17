@@ -17,9 +17,11 @@ public class PolicyManager implements Protocol {
 	public int addElev(ElevControl elev) {
 		_elevs.add(elev);
 		if(null != _polocy) {
+			elev.setElevId(_elevs.indexOf(elev));
 			_polocy.addElev(_elevs.indexOf(elev), elev);
+			return _elevs.indexOf(elev);
 		}
-		return _elevs.indexOf(elev);
+		return -1;
 	}
 	
 	public void set_polocy(Policy polocy) {

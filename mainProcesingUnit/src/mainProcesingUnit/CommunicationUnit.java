@@ -12,6 +12,7 @@ import floor.Message;
 
 public class CommunicationUnit implements UiHandler , commuicationHandler{
 	public static final int FLOOR_PORT = 10000;
+	public static final int ELEV_PORT = 10001;
 
 	Protocol _protocol;
 
@@ -76,7 +77,44 @@ public class CommunicationUnit implements UiHandler , commuicationHandler{
 	}
 	
 	public void startCarServer() {
-		_carServerSocket = 
+		try {
+			_carServerSocket = new ServerSocket(ELEV_PORT);
+		} catch (IOException e) {
+			System.out.println("can't start server");
+			//e.printStackTrace();
+			return;
+		}
+
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				while (true) {
+					
+					Socket socket;
+					ElevControl elevControl;
+					try {
+						socket = _carServerSocket.accept();
+					} catch (IOException e) {
+						System.out.println("an elevator fail to connect");
+						// e.printStackTrace();
+						continue;
+					}
+					
+					try {
+						elevControl = new ElevComminication(socket, _protocol);
+					} catch (Exception e) {
+						System.out.println("fail to build the elevator handle");
+						// e.printStackTrace();
+						continue;
+					}
+					
+					_protocol.addElev(elevControl);
+					
+				}
+			}
+		}).start();
+		
 	}
 
 	public void sendToFloor(Message msg) {
@@ -86,14 +124,20 @@ public class CommunicationUnit implements UiHandler , commuicationHandler{
 
 	@Override
 	public void sendToCar(Message msg) {
+		throw new RuntimeException("unimplemented");
+		/* TODO - remove method 
 		System.out.println("sending to car: " + msg.encode());
 		_carOut.println(msg.encode());
-	}
+		*/
+		}
 
 	@Override
 	public void sendToCar(int floor, Action act, boolean status) {
+		throw new RuntimeException("unimplemented");
+		/* TODO - remove method
 		Message msg = new Message(floor, act, status, 0);
 		sendToCar(msg);
+		*/
 	}
 
 	@Override

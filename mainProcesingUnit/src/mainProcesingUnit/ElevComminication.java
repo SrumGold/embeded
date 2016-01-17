@@ -2,6 +2,7 @@ package mainProcesingUnit;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -22,15 +23,36 @@ public class ElevComminication implements ElevControl, Runnable {
 	boolean _boolAns;
 	
 	
-	public ElevComminication(Socket carSocket, PrintWriter carOut, BufferedReader carIn, Protocol protocol) {
-		_carSocket = carSocket;
-		_carIn = carIn;
-		_carOut = carOut; 
+	public ElevComminication(Socket carSocket, Protocol protocol) throws Exception {
 		_protocol = protocol;
 		_elevId = -1;
+		
+		if (setSocket(carSocket)) {
+			throw new Exception("fail to initialize bufers");
+		}
+
 	}
 
+	private boolean setSocket(Socket socket) {
+		_carSocket = socket;
+		
+		try {
+			_carIn = new BufferedReader(new InputStreamReader(_carSocket.getInputStream()));
+		} catch (IOException e) {
+			System.out.println("can't open input stream");
+			return false;
+		}
 
+		try {
+			_carOut = new PrintWriter(_carSocket.getOutputStream(), true);
+		} catch (IOException e) {
+			System.out.println("can't open output stream");
+			return false;
+		}
+		
+		return true;
+	}
+	
 	public void sendToCar(Message msg) {
 		if (-1 == _elevId) {
 			throw new RuntimeException("elevator id not initialized");
@@ -93,11 +115,11 @@ public class ElevComminication implements ElevControl, Runnable {
 
 	}
 
-	public int get_elevId() {
+	public int getElevId() {
 		return _elevId;
 	}
 	
-	public void set_elevId(int _elevId) {
+	public void setElevId(int _elevId) {
 		this._elevId = _elevId;
 	}
 
