@@ -21,6 +21,7 @@ public enum Action {
 	CLOSE_DOOR, 
 	OPEN_DOOR, 
 	GOTO_FLOOR,
+	SET_INDICATION_LED,    // TODO - Michael you need to add this
 	
 	// Actions queries for the Elevator Car
 	QUERY_LAST_FLOOR,

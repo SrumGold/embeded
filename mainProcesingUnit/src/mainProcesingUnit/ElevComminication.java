@@ -133,6 +133,7 @@ public class ElevComminication implements ElevControl, Runnable {
 			try {
 				line = _carIn.readLine();
 				m = Message.decode(line);
+				m._elevId = _elevId;
 			} catch (IOException e) {
 				System.out.println("fail to read line from net");
 				return;
@@ -153,6 +154,11 @@ public class ElevComminication implements ElevControl, Runnable {
 		}
 
 
+	}
+
+	@Override
+	public void sendIndication(int floor, Action act, boolean status) {
+		this.sendToCar(floor, Action.SET_INDICATION_LED, status);
 	}
 
 }

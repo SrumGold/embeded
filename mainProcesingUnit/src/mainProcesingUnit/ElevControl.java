@@ -1,6 +1,6 @@
 package mainProcesingUnit;
 
-public interface ElevControl {
+public interface ElevControl extends UiHandler{
 	
 	public int getFloor(); //TODO needed?
 	public boolean canStopAt(int floor);
