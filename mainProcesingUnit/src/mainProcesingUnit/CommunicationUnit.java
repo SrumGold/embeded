@@ -55,8 +55,8 @@ public class CommunicationUnit implements UiHandler , commuicationHandler{
 
 			@Override
 			public void run() {
+				System.out.println("debbug: start run");
 				while (true) {
-					System.out.println("debbug: start run");
 					String line;
 					Message m = null;
 					try {
