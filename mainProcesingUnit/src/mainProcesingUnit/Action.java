@@ -1,4 +1,4 @@
-package floor;
+package mainProcesingUnit;
 
 public enum Action {
 	// Actions - floor module support
