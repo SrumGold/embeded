@@ -1,40 +1,30 @@
 package mainProcesingUnit;
 
-import floor.Action;
-import floor.Message;
+import java.util.Scanner;
 
 public class Main {
 
 	public static void main(String[] args) {
+		@SuppressWarnings("resource")
+		Scanner scanner = new Scanner(System.in);    // Engineers UI
 
+		// initiate the main server
 		CommunicationUnit comm = new CommunicationUnit();
-		comm.setProtocol(new Protocol() {
-			
-			@Override
-			public void processMsg(Message msg) {
-				switch (msg._act) {
-				case FLOOR_PRESS_UP:
-					comm.sendIndication(msg._floor, Action.FLOOR_LED_UP, true);
-					break;
-				case FLOOR_PRESS_DOWN:
-					comm.sendIndication(msg._floor, Action.FLOOR_LED_DOWN, true);
-					break;
-				default:
-					System.out.println("debbug: cant handle messege");
-					break;
-				}
-			}
-		});
+		comm.setProtocol(new PolicyManager());
 
 		comm.startFloorControl();
+		comm.startCarServer();
+		
+		System.out.println("debug: main(): CPU is ready!");
 		
 		while (true) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			String line = scanner.nextLine();
+			if (line.equals("exit")){
+				// TODO - stop everything
+				return;
 			}
+			
+			// TODO - add here engineering operations
 		}
 		
 	}
