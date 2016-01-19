@@ -4,82 +4,104 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
 
-import MainLogic.ElevatorUI;
 import floor.Action;
 import floor.Direction;
 import floor.Message;
+import userInterface.UiHandler;
 
-public class CommunicationUnit {
-	public static final int ELEVCAR_PORT = 12345;
-	ElevatorUI _elevatorUI;
-	Socket _socket;
-	PrintWriter _out;
-	BufferedReader _in;
-	
-	public void setUI(ElevatorUI elevatorUI) {
-		_elevatorUI = elevatorUI;
-		
-	}
+public class CommunicationUnit implements UiHandler, commuicationHandler{
+	public static final int PASSENGER_PORT = 12345;
+	public static final int CPU_PORT = 12355;
 
-	public void start() {
-		if (null == _elevatorUI) {
-			throw new NullPointerException("elevatorUI not initialized");
-		}
-	
+	Protocol _protocol;
+
+	Socket _passangerSocket; // socket to connect to passenger UI inside the elevator
+	PrintWriter _passengerOut;
+	BufferedReader _passengerIn;
+
+	ServerSocket _carClientSocket;
+
+	@SuppressWarnings("resource")
+	public void startPassengerControl() {
 		try {
-			_socket = new Socket("127.0.0.1", ELEVCAR_PORT);
-		} catch (IOException e) {
-			System.out.println("can't connect server");
+			_passangerSocket = new ServerSocket(PASSENGER_PORT).accept();
+		} catch (IOException e1) {
+			System.out.println("can't start server");
+			//e1.printStackTrace();
 			return;
 		}
-		
+
 		try {
-			_in = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
+			_passengerIn = new BufferedReader(new InputStreamReader(_passangerSocket.getInputStream()));
 		} catch (IOException e) {
 			System.out.println("can't open input stream");
 			return;
 		}
-		
+
 		try {
-			_out = new PrintWriter(_socket.getOutputStream(), true);
+			_passengerOut = new PrintWriter(_passangerSocket.getOutputStream(), true);
 		} catch (IOException e) {
 			System.out.println("can't open output stream");
 			return;
 		}
+
+		System.out.println("passenger UI connected!");
 		
 		new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				while (true) {
+					System.out.println("debbug: start run");
 					String line;
 					Message m = null;
 					try {
-						line = _in.readLine();
+						line = _passengerIn.readLine();
 						m = Message.decode(line);
 					} catch (IOException e) {
 						System.out.println("fail to read line from net");
+						return;
 					}
-					
+					System.out.println("debbug: got message: " + line);
 					if (null != m) {
-						//TODO - make all cases for requests from this unit according to actions
-						System.out.println("ECHO - recieved: " + m);
+						_protocol.processMsg(m);
 					}
-					
+
 				}
 			}
 		}).start();
-		
 	}
 	
-	public void sendPressToFloor(int floor) {
-		Message m;
-		m = new Message(floor, Action.ELEV_FLOOR_PRESS, true, -1);
+	public void startCarClient() {
+		// TODO - open connection with the CPU server
 		
-		System.out.println("Sending press button in elev. to floor:\n " + m.encode());
-		_out.println(m.encode());
 	}
 
+	@Override
+	public void sendToCPU(Message msg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendToCPU(int floor, Action act, boolean status) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendIndication(Action act, boolean status) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void setProtocol(Protocol p) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 }
