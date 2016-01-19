@@ -7,14 +7,12 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import floor.Action;
-import floor.Direction;
-import floor.Message;
-import userInterface.UiHandler;
+import mainProcesingUnit.Action;
+import mainProcesingUnit.Message;
 
-public class CommunicationUnit implements UiHandler, commuicationHandler{
+
+public class CommunicationUnit implements CommuicationHandler{
 	public static final int PASSENGER_PORT = 12345;
-	public static final int CPU_PORT = 12355;
 
 	Protocol _protocol;
 
@@ -24,8 +22,14 @@ public class CommunicationUnit implements UiHandler, commuicationHandler{
 
 	ServerSocket _carClientSocket;
 
-	@SuppressWarnings("resource")
+	private Socket _socket;  // socket to the CPU unit
+	private PrintWriter _out;
+	private BufferedReader _in;
+
 	public void startPassengerControl() {
+		// TODO - remove
+		throw new RuntimeException("shuld be removed");
+		/*
 		try {
 			_passangerSocket = new ServerSocket(PASSENGER_PORT).accept();
 		} catch (IOException e1) {
@@ -73,34 +77,74 @@ public class CommunicationUnit implements UiHandler, commuicationHandler{
 				}
 			}
 		}).start();
+		*/
 	}
 	
 	public void startCarClient() {
-		// TODO - open connection with the CPU server
+		if (null == _protocol) {
+			throw new NullPointerException("protocol is null");
+		}
 		
+		try {
+			_socket = new Socket(mainProcesingUnit.CommunicationUnit.CPU_ADDR, mainProcesingUnit.CommunicationUnit.ELEV_PORT);
+		} catch (IOException e) {
+			System.out.println("can't connect server");
+			return;
+		}
+		
+		try {
+			_in = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
+		} catch (IOException e) {
+			System.out.println("can't open input stream");
+			return;
+		}
+		
+		try {
+			_out = new PrintWriter(_socket.getOutputStream(), true);
+		} catch (IOException e) {
+			System.out.println("can't open output stream");
+			return;
+		}
+		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				System.out.println("debug: commonocation is up!");
+				while (true) {
+					String line;
+					Message m = null;
+					try {
+						line = _in.readLine();
+						m = Message.decode(line);
+					} catch (IOException e) {
+						System.out.println("fail to read line from net");
+						continue;
+					}
+					
+					if (null != m) {
+						_protocol.processMsg(m);
+					}
+					
+				}
+			}
+		}).start();
 	}
 
 	@Override
 	public void sendToCPU(Message msg) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("debug: sending to CPU: " + msg.encode());
+		_out.println(msg.encode());
 	}
 
 	@Override
 	public void sendToCPU(int floor, Action act, boolean status) {
-		// TODO Auto-generated method stub
-		
+		Message msg = new Message(floor, act, status, -1);
+		sendToCPU(msg);
 	}
 
-	@Override
-	public void sendIndication(Action act, boolean status) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void setProtocol(Protocol p) {
-		// TODO Auto-generated method stub
-		
+		_protocol = p;
 	}
 
 	
