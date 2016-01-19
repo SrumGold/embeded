@@ -1,9 +1,9 @@
 package Connection;
 
-import floor.Action;
-import floor.Message;
+import mainProcesingUnit.Action;
+import mainProcesingUnit.Message;
 
-public interface commuicationHandler {
+public interface CommuicationHandler {
 	public void sendToCPU(Message msg);
 	public void sendToCPU(int floor, Action act, boolean status);
 	public void setProtocol(Protocol p);
