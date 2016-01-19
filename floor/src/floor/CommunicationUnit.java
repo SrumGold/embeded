@@ -6,8 +6,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import mainProcesingUnit.Action;
+import mainProcesingUnit.Direction;
+import mainProcesingUnit.Message;
+
 public class CommunicationUnit {
-	public static final int FLOOR_PORT = 10000;
+	
 	FloorUI _floorUI;
 	Socket _socket;
 	PrintWriter _out;
@@ -24,7 +28,7 @@ public class CommunicationUnit {
 		}
 	
 		try {
-			_socket = new Socket("127.0.0.1", FLOOR_PORT);
+			_socket = new Socket(mainProcesingUnit.CommunicationUnit.CPU_ADDR, mainProcesingUnit.CommunicationUnit.FLOOR_PORT);
 		} catch (IOException e) {
 			System.out.println("can't connect server");
 			return;
