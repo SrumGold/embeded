@@ -3,6 +3,8 @@ package floor;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
+import mainProcesingUnit.Direction;
+
 
 public class Main {
 	
@@ -10,6 +12,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
+		@SuppressWarnings("resource")
 		Scanner scanner = new Scanner(System.in);
 		
 		// TODO - start comunication

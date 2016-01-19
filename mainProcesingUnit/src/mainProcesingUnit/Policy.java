@@ -1,7 +1,5 @@
 package mainProcesingUnit;
 
-import floor.Action;
-
 public interface Policy {
 	
 	public void floorUpButton(int floor);

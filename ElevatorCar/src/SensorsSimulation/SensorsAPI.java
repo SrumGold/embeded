@@ -2,10 +2,9 @@ package SensorsSimulation;
 
 import java.util.Timer;
 
+import mainProcesingUnit.Direction;
 import ElevatorMoving.Moving;
 import ElevatorStatus.Status;
-import floor.Direction;
-
 import SensorsSimulation.SensorTypes;
 
 public class SensorsAPI{
