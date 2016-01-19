@@ -10,7 +10,14 @@ public class Main {
 
 		// initiate the main server
 		CommunicationUnit comm = new CommunicationUnit();
-		comm.setProtocol(new PolicyManager());
+		PolicyManager policyManager = new PolicyManager();
+		
+		Policy policy = new DefaultPolicy();
+		policy.setUiHandler(comm);
+		
+		policyManager.set_policy(policy);
+		
+		comm.setProtocol(policyManager);
 
 		comm.startFloorControl();
 		comm.startCarServer();
