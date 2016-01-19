@@ -2,11 +2,9 @@ package mainProcesingUnit;
 
 import java.util.ArrayList;
 
-import floor.Message;
-
 public class PolicyManager implements Protocol {
 	
-	Policy _polocy;
+	Policy _policy;
 	
 	ArrayList<ElevControl> _elevs;
 
@@ -16,34 +14,34 @@ public class PolicyManager implements Protocol {
 	
 	public int addElev(ElevControl elev) {
 		_elevs.add(elev);
-		if(null != _polocy) {
+		if(null != _policy) {
 			elev.setElevId(_elevs.indexOf(elev));
-			_polocy.addElev(_elevs.indexOf(elev), elev);
+			_policy.addElev(_elevs.indexOf(elev), elev);
 			return _elevs.indexOf(elev);
 		}
 		return -1;
 	}
 	
-	public void set_polocy(Policy polocy) {
-		this._polocy = polocy;
-		_elevs.forEach(e -> _polocy.addElev(_elevs.indexOf(e), e));
+	public void set_policy(Policy policy) {
+		this._policy = policy;
+		_elevs.forEach(e -> _policy.addElev(_elevs.indexOf(e), e));
 	}
 	
 	@Override
 	public void processMsg(Message msg) {
 		switch (msg._act) {
 		case FLOOR_PRESS_UP:
-			_polocy.floorUpButton(msg._floor);
+			_policy.floorUpButton(msg._floor);
 			break;
 		case FLOOR_PRESS_DOWN:
-			_polocy.floorDownButton(msg._floor);
+			_policy.floorDownButton(msg._floor);
 			break;
 			
 		case ELEV_GENERAL_BUTTON:
-			_polocy.generalButtonInCar(msg._elevId, msg._floor);
+			_policy.generalButtonInCar(msg._elevId, msg._floor);
 			break;
 		case ELEV_FLOOR_PRESS:
-			_polocy.floorButtonInCar(msg._elevId, msg._floor);
+			_policy.floorButtonInCar(msg._elevId, msg._floor);
 			break;
 
 		case ELEV_DOOR_OPENED:
@@ -51,7 +49,7 @@ public class PolicyManager implements Protocol {
 		case ELEV_FLOOR_ARIVED:
 		case ELEV_PASS_BY_FLOOR:
 		case ELEV_START_MOVE:
-			_polocy.elevatorStatusUpdate(msg._elevId, msg._act, msg._floor);
+			_policy.elevatorStatusUpdate(msg._elevId, msg._act, msg._floor);
 			
 			break;
 			
