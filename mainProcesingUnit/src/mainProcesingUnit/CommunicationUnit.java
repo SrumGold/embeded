@@ -7,12 +7,10 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import floor.Action;
-import floor.Message;
-
-public class CommunicationUnit implements UiHandler , commuicationHandler{
+public class CommunicationUnit implements UiHandler , CommuicationHandler{
 	public static final int FLOOR_PORT = 10000;
 	public static final int ELEV_PORT = 10001;
+	public static final String CPU_ADDR = "localhost";	
 
 	Protocol _protocol;
 
@@ -92,7 +90,7 @@ public class CommunicationUnit implements UiHandler , commuicationHandler{
 				while (true) {
 					
 					Socket socket;
-					ElevControl elevControl;
+					ElevComminication elevControl;
 					try {
 						socket = _carServerSocket.accept();
 					} catch (IOException e) {
@@ -103,6 +101,7 @@ public class CommunicationUnit implements UiHandler , commuicationHandler{
 					
 					try {
 						elevControl = new ElevComminication(socket, _protocol);
+						new Thread(elevControl).start();
 					} catch (Exception e) {
 						System.out.println("fail to build the elevator handle");
 						// e.printStackTrace();
@@ -118,7 +117,7 @@ public class CommunicationUnit implements UiHandler , commuicationHandler{
 	}
 
 	public void sendToFloor(Message msg) {
-		System.out.println("sending to floor: " + msg.encode());
+		System.out.println("debug: sending to floor: " + msg.encode());
 		_floorOut.println(msg.encode());
 	}
 
@@ -142,7 +141,7 @@ public class CommunicationUnit implements UiHandler , commuicationHandler{
 
 	@Override
 	public void sendIndication(int floor, Action act, boolean status) {
-		Message msg = new Message(floor, act, status, 0);
+		Message msg = new Message(floor, act, status, -1);
 		sendToFloor(msg);
 	}
 

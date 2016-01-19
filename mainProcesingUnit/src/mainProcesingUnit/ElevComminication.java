@@ -6,9 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import floor.Action;
-import floor.Message;
-
 public class ElevComminication implements ElevControl, Runnable {
 	private static final long WAIT_TIME_OUT = 100;
 
@@ -27,7 +24,7 @@ public class ElevComminication implements ElevControl, Runnable {
 		_protocol = protocol;
 		_elevId = -1;
 		
-		if (setSocket(carSocket)) {
+		if (!setSocket(carSocket)) {
 			throw new Exception("fail to initialize bufers");
 		}
 
