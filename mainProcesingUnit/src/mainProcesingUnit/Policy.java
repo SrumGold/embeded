@@ -13,5 +13,6 @@ public interface Policy {
 	
 	public void errors(); // TODO
 	public void addElev(int elevID, ElevControl elev);
+	public void setUiHandler(UiHandler uiHandler);
 
 }
