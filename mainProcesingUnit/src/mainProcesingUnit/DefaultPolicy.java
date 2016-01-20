@@ -1,7 +1,6 @@
 package mainProcesingUnit;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,9 +11,9 @@ public class DefaultPolicy implements Policy {
 		public int lastFloor;
 		public int destenationFloor;
 		public int doorLastStatus;
-		public Collection<Integer> requests;
+		public ArrayList<Integer> requests;
 		
-		public Status(int lastFloor, int destenationFloor, int doorLastStatus, Collection<Integer> requests) {
+		public Status(int lastFloor, int destenationFloor, int doorLastStatus, ArrayList<Integer> requests) {
 			this.lastFloor = lastFloor;
 			this.destenationFloor = destenationFloor;
 			this.doorLastStatus = doorLastStatus;
@@ -84,15 +83,15 @@ public class DefaultPolicy implements Policy {
 			return;
 		} else {
 			if (!s.requests.isEmpty()){
-				int next = s.lastFloor;
+				int next = 10000;
 				for (int f : s.requests) {
-					if (Math.abs(f-s.lastFloor) < next-s.lastFloor){
+					if (Math.abs(f-s.lastFloor) < Math.abs(next-s.lastFloor)){
 						next = f;
 					}
 				}
 				
 				s.destenationFloor = next;
-				s.requests.remove(next);
+				s.requests.remove(s.requests.indexOf(next));
 				_elevsComm.get(elevId).goToFloor(next);
 				// TODO - start "goto" timeout timer
 			}

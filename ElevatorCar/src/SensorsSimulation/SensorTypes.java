@@ -9,6 +9,7 @@ public enum SensorTypes {
 	// Orientation sensors, located outside the elevator, on each floor at the building 
 	ABOVE_FLOOR,
 	BELLOW_FLOOR,
+	ON_FLOOR,
 	
 	WEIGHT_LEGAL,
 }

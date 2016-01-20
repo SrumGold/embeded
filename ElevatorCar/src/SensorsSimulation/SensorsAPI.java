@@ -1,6 +1,8 @@
 package SensorsSimulation;
 
+import java.util.Calendar;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import mainProcesingUnit.Direction;
 import ElevatorMoving.Moving;
@@ -11,23 +13,21 @@ public class SensorsAPI{
 
 	//Fields for the Sensors simulation
 	float _velocity; // the motor's velocity of the elevator - real number from range: [0,1]
-	Direction _dir; // the direction on which the elevator is moving
+	long _timeStamp; // time of last update
 	SensorTypes _doorSensor; // the state of the elevator's door
-	int _currentFloor; // the actual floor number the elevator is at
+	float _currentPosition; // the actual floor number the elevator is at
 	Timer _interruptSchedTimer; // The timer that is responsible for interrupting the appropriate listeners
+	
 	
 	// the listeners that can be interrupted by the sensors
 	Moving _moving;
-	Status _status;
 	
-	public SensorsAPI(Moving moving, Status status) {
+	public SensorsAPI(Moving moving) {
 		_interruptSchedTimer = new Timer("interruptSimulationTimer");
 		_velocity = 0;
-		_dir = Direction.IDLE;
-		_currentFloor = 0;
+		_currentPosition = 0;
 		_doorSensor = SensorTypes.DOOR_CLOSED;
 		_moving = moving;
-		_status = status;
 	}
 	
 //                 _             
@@ -37,23 +37,87 @@ public class SensorsAPI{
 //| | | | | | (_) | || (_) | |   
 //|_| |_| |_|\___/ \__\___/|_|   
 //                 
-                  
-	public void changeVelocity(float newVelocity){
-		_velocity = newVelocity;
+    
+	private void updatePosition() {
+		/* update new position */
+		long now = Calendar.getInstance().getTimeInMillis();
+		long deltaT = now - _timeStamp;
+		_currentPosition = _currentPosition + ((_velocity * (float)deltaT) / (float)1000.0);
+		_timeStamp = now;
 	}
 	
-	public void initiateInterruptFromOrientationSensors(){
+	public void changeVelocity(float newVelocity){
 		
-		switch (_dir){
-		case UP:
-			//TODO - update the global variables and interrupt the listeners accordingly
-			break;
-		case DOWN:
-			//TODO - update the global variables and interrupt the listeners accordingly
-			break;
-		default:
-			break;
+		/* update new position */
+		updatePosition();
+		_velocity = newVelocity;
+		
+		initiateInterruptFromOrientationSensors();
+		
+	}
+	
+	/**
+	 * restart the timer
+	 */
+	public void initiateInterruptFromOrientationSensors(){
+		double delay = 0;
+		SensorTypes nextSensor;
+		
+		_interruptSchedTimer.cancel();
+		_interruptSchedTimer = new Timer();
+		
+		if (0 == _velocity) {
+			return;
 		}
+		
+		if (0.1 >= (_currentPosition % 1.0)){
+			if (0 < _velocity) {
+				double deltaX = 0.1 - (_currentPosition % 1.0);
+				delay = _velocity * deltaX * 1000.0;
+				nextSensor = SensorTypes.ABOVE_FLOOR;
+			} else {
+				double deltaX = (_currentPosition % 1.0) - 0.0;
+				delay = -1.0 * _velocity * deltaX * 1000.0;
+				nextSensor = SensorTypes.ON_FLOOR;
+			}
+				
+		} else if (0.9 > (_currentPosition % 1.0)) {
+			if (0 < _velocity) {
+				double deltaX = 0.9 - (_currentPosition % 1.0);
+				delay = _velocity * deltaX * 1000.0;
+				nextSensor = SensorTypes.BELLOW_FLOOR;
+			} else {
+				double deltaX = (_currentPosition % 1.0) - 0.1;
+				delay = -1.0 * _velocity * deltaX * 1000.0;
+				nextSensor = SensorTypes.ABOVE_FLOOR;
+			}
+		} else {
+			if (0 < _velocity) {
+				double deltaX = 1.0 - (_currentPosition % 1.0);
+				delay = _velocity * deltaX * 1000.0;
+				nextSensor = SensorTypes.ON_FLOOR;
+			} else {
+				double deltaX = (_currentPosition % 1.0) - 0.9;
+				delay = -1.0 * _velocity * deltaX * 1000.0;
+				nextSensor = SensorTypes.BELLOW_FLOOR;
+			}			
+		}
+		
+		System.out.println("debug: schedule interupt in " + delay + " mils");
+		if (delay <= 1.0) {
+			delay += 1;
+		}
+		
+		_interruptSchedTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				updatePosition();
+				System.out.println("debug: interupt sensor : " + nextSensor + " , loc = " + _currentPosition);
+				initiateInterruptFromOrientationSensors();
+				_moving.interrupt(nextSensor);
+			}
+		}, (long) delay);
+		
 	}
 	
 //    _                      

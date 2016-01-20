@@ -7,8 +7,9 @@ import Connection.Protocol;
 import Connection.CommuicationHandler;
 import ElevatorMoving.Moving;
 import ElevatorStatus.Status;
+import SensorsSimulation.SensorTypes;
 
-public class ElevMainProtocol implements Protocol {
+public class ElevMainProtocol implements Protocol , Interrupted{
 
 	private ElevatorUI _elevatorUI;
 	private CommuicationHandler _comm;
@@ -19,7 +20,7 @@ public class ElevMainProtocol implements Protocol {
 		_elevatorUI = elevatorUI;
 		_comm = comm;
 		_moving = moving;
-		_nextFloor = 1;
+		_nextFloor = 0;
 	}
 	
 	@Override
@@ -67,7 +68,7 @@ public class ElevMainProtocol implements Protocol {
 		Direction direction = Status.getDirection();
 		switch (direction) {
 		case IDLE:
-			ans = false;
+			ans = true;
 			break;
 		case UP:
 			ans = (floor - lastFloor) > 1;
@@ -88,7 +89,7 @@ public class ElevMainProtocol implements Protocol {
 	 */
 	private void goToFloor(int floor) {
 		if (!canStop(floor) || _nextFloor == floor) {
-			System.out.println("debog: can't stop at floor: " + floor);
+			System.out.println("debug: can't stop at floor: " + floor);
 			return;
 		}
 		_nextFloor = floor;
@@ -122,5 +123,15 @@ public class ElevMainProtocol implements Protocol {
 		}
 		
 		_moving.goToFloor(floor);
+	}
+
+	@Override
+	public void interrupt(SensorTypes sensor) {
+		if (sensor.equals(SensorTypes.ON_FLOOR)){
+			System.out.println("debug: reach to floor " + _nextFloor);
+			// TODO - open doors
+			_comm.sendToCPU(_nextFloor, Action.ELEV_FLOOR_ARIVED, true);
+			
+		}
 	}
 }
